@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  the_mind_game:
+    build:
+      context: .
+      dockerfile: devops/dev/php74.dockerfile
+    container_name: the_mind_game
+    hostname: php
+    volumes:
+      - .:/srv/TheMindGame:delegated
+    ports:
+      - 8080:8080

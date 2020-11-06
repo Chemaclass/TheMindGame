@@ -1,0 +1,38 @@
+{
+    "description": "The Mind game logic",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": "^7.4"
+    },
+    "require-dev": {
+        "ext-readline": "*",
+        "friendsofphp/php-cs-fixer": "^2.16",
+        "symfony/var-dumper": "^5.1",
+        "phpunit/phpunit": "^9.4",
+        "vimeo/psalm": "^4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test-all": [
+            "@test-quality",
+            "@test-unit"
+        ],
+        "test-quality": [
+            "@psalm"
+        ],
+        "test-unit": "./vendor/bin/phpunit",
+        "psalm": "./vendor/bin/psalm",
+        "csrun": "./vendor/bin/php-cs-fixer fix --dry-run",
+        "csfix": "./vendor/bin/php-cs-fixer fix"
+    }
+}
