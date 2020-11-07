@@ -1,17 +1,15 @@
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Player {
+    private static final int MAX_VALUE = 100;
 
-    private static final int MIN_VALUE = 1;
-    private static final int MAX_VALUE = 150;
+    private final LinkedList<Card> cards;
 
-    private final List<Card> cards;
-
+    /**
+     * A player consist of a list of (already-sorted) cards
+     */
     public static Player create(int currentLevel, List<Player> existingPlayerCards) {
-        List<Card> cards = new ArrayList<>();
+        Card[] cards = new Card[currentLevel];
         List<Integer> allNumbers = new ArrayList<>();
 
         for (Player existingPlayerCard : existingPlayerCards) {
@@ -23,29 +21,31 @@ public class Player {
         for (int i = 0; i < currentLevel; i++) {
             int cardNumber;
             do {
-                cardNumber = new Random().nextInt(MAX_VALUE) + 1;
+                cardNumber = new Random().nextInt(MAX_VALUE);
             } while (allNumbers.contains(cardNumber));
 
             allNumbers.add(cardNumber);
-            cards.add(new Card(cardNumber));
+            cards[i] = new Card(cardNumber);
         }
+        Arrays.sort(cards);
 
-        return new Player(cards);
+        return new Player(new LinkedList<>(Arrays.asList(cards)));
     }
 
-    private Player(List<Card> cards) {
+    private Player(LinkedList<Card> cards) {
         this.cards = cards;
     }
 
     public Card popMinCard() {
-        Card minCard = this.cards
-                .stream()
-                .min(Comparator.comparing(Card::number))
-                .get();
-
-        this.cards.remove(minCard);
-
-        return minCard;
+        return this.cards.pop();
+//        Card minCard = this.cards
+//                .stream()
+//                .min(Comparator.comparing(Card::number))
+//                .get();
+//
+//        this.cards.remove(minCard);
+//
+//        return minCard;
     }
 
     public int totalCards() {

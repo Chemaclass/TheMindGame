@@ -1,4 +1,6 @@
-public class Card {
+import java.util.Comparator;
+
+public class Card implements Comparable<Card> {
     private final int number;
 
     public Card(int number) {
@@ -12,5 +14,10 @@ public class Card {
     @Override
     public String toString() {
         return "Card(" + number + ')';
+    }
+
+    @Override
+    public int compareTo(Card o) {
+        return this.number >= o.number ? 1 : 0;
     }
 }

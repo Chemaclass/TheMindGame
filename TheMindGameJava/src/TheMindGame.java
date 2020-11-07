@@ -2,6 +2,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class TheMindGame {
+    public static final int FAILED_GAMES_DEBUG = 2_500_000;
     private final int numPlayers;
     private final int numLevelsToWin;
 
@@ -9,7 +10,7 @@ public class TheMindGame {
     private int currentLevel = 1;
 
     public static void main(String[] args) {
-        int numPlayers = 3, numLevelsToWin = 3;
+        int numPlayers = 2, numLevelsToWin = 4;
         TheMindGameResult result = new TheMindGame(numPlayers, numLevelsToWin).play();
         System.out.println(result);
     }
@@ -26,7 +27,9 @@ public class TheMindGame {
             List<Card> pileOfCards = new ArrayList<>();
             int desiredPileOfCardsNumber = numPlayers * currentLevel;
             List<Player> players = dealCardsToEachPlayer(numPlayers, currentLevel);
-            System.err.println(players);
+            if (isDebugEnabled()) {
+                System.err.println(players);
+            }
 
             do {
                 Card currentCard = popRandomlyOnePlayerCard(players);
@@ -35,7 +38,9 @@ public class TheMindGame {
                     failedGames++;
                     currentLevel = 1;
                     successfulPiles = new HashMap<>();
-                    System.out.println("Failed game number " + failedGames + ". Trying again... brrr");
+                    if (isDebugEnabled()) {
+                        System.out.println("Failed game number " + failedGames + ". Trying again... brrr");
+                    }
                     break;
                 }
 
@@ -62,6 +67,10 @@ public class TheMindGame {
         }
 
         return players;
+    }
+
+    private boolean isDebugEnabled() {
+        return failedGames % FAILED_GAMES_DEBUG == 0;
     }
 
     private boolean isValidCardInPile(Card currentCard, List<Card> pileOfCards) {
