@@ -2,26 +2,35 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class TheMindGame {
+    private final int numPlayers;
+    private final int numLevelsToWin;
+
+    private int failedGames = 0;
+    private int currentLevel = 1;
 
     public static void main(String[] args) {
-        int numPlayers = 3, numLevelsToWin = 2;
-        TheMindGameResult result = new TheMindGame().play(numPlayers, numLevelsToWin);
+        int numPlayers = 3, numLevelsToWin = 3;
+        TheMindGameResult result = new TheMindGame(numPlayers, numLevelsToWin).play();
         System.out.println(result);
     }
 
-    public TheMindGameResult play(int numPlayers, int numLevelsToWin) {
-        int failedGames = 0, currentLevel = 1;
+    public TheMindGame(int numPlayers, int numLevelsToWin) {
+        this.numPlayers = numPlayers;
+        this.numLevelsToWin = numLevelsToWin;
+    }
+
+    public TheMindGameResult play() {
         List<Card> pileOfCards = new ArrayList<>();
         Map<Integer, List<Card>> successfulPiles = new HashMap<>();
 
         while (currentLevel <= numLevelsToWin) {
             int desiredPileOfCardsNumber = numPlayers * currentLevel;
-            List<PlayerCards> players = this.dealCardsToEachPlayer(numPlayers, currentLevel);
+            List<PlayerCards> players = dealCardsToEachPlayer(numPlayers, currentLevel);
 
             do {
-                Card currentCard = this.popRandomlyOnePlayerCard(players);
+                Card currentCard = popRandomlyOnePlayerCard(players);
 
-                if (!this.isValidCardInPile(currentCard, pileOfCards)) {
+                if (!isValidCardInPile(currentCard, pileOfCards)) {
                     failedGames++;
                     currentLevel = 1;
                     successfulPiles = new HashMap<>();
@@ -30,7 +39,7 @@ public class TheMindGame {
                 }
 
                 pileOfCards.add(currentCard);
-            } while (this.areStillCardsToPlay(players));
+            } while (areStillCardsToPlay(players));
 
             if (pileOfCards.size() >= desiredPileOfCardsNumber) {
                 successfulPiles.put(currentLevel, pileOfCards);
