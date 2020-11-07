@@ -3,18 +3,18 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
-public class PlayerCards {
+public class Player {
 
     private static final int MIN_VALUE = 1;
     private static final int MAX_VALUE = 150;
 
-    private List<Card> cards;
+    private final List<Card> cards;
 
-    public static PlayerCards create(int currentLevel, List<PlayerCards> existingPlayerCards) {
+    public static Player create(int currentLevel, List<Player> existingPlayerCards) {
         List<Card> cards = new ArrayList<>();
         List<Integer> allNumbers = new ArrayList<>();
 
-        for (PlayerCards existingPlayerCard : existingPlayerCards) {
+        for (Player existingPlayerCard : existingPlayerCards) {
             for (Card card : existingPlayerCard.cards) {
                 allNumbers.add(card.number());
             }
@@ -30,10 +30,10 @@ public class PlayerCards {
             cards.add(new Card(cardNumber));
         }
 
-        return new PlayerCards(cards);
+        return new Player(cards);
     }
 
-    private PlayerCards(List<Card> cards) {
+    private Player(List<Card> cards) {
         this.cards = cards;
     }
 
@@ -52,11 +52,12 @@ public class PlayerCards {
         return this.cards.size();
     }
 
-    public List<Card> cards() {
-        return this.cards;
-    }
-
     public boolean hasCards() {
         return totalCards() > 0;
+    }
+
+    @Override
+    public String toString() {
+        return "- " + cards;
     }
 }

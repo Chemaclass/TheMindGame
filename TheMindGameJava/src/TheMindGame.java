@@ -20,12 +20,13 @@ public class TheMindGame {
     }
 
     public TheMindGameResult play() {
-        List<Card> pileOfCards = new ArrayList<>();
         Map<Integer, List<Card>> successfulPiles = new HashMap<>();
 
         while (currentLevel <= numLevelsToWin) {
+            List<Card> pileOfCards = new ArrayList<>();
             int desiredPileOfCardsNumber = numPlayers * currentLevel;
-            List<PlayerCards> players = dealCardsToEachPlayer(numPlayers, currentLevel);
+            List<Player> players = dealCardsToEachPlayer(numPlayers, currentLevel);
+            System.err.println(players);
 
             do {
                 Card currentCard = popRandomlyOnePlayerCard(players);
@@ -41,21 +42,23 @@ public class TheMindGame {
                 pileOfCards.add(currentCard);
             } while (areStillCardsToPlay(players));
 
-            if (pileOfCards.size() >= desiredPileOfCardsNumber) {
-                successfulPiles.put(currentLevel, pileOfCards);
-                pileOfCards = new ArrayList<>();
-                currentLevel++;
+            // Don't level-up if the pile miss cards
+            if (pileOfCards.size() < desiredPileOfCardsNumber) {
+                continue;
             }
+
+            successfulPiles.put(currentLevel, pileOfCards);
+            currentLevel++;
         }
 
         return new TheMindGameResult(failedGames, successfulPiles);
     }
 
-    private List<PlayerCards> dealCardsToEachPlayer(int numPlayers, int currentLevel) {
-        List<PlayerCards> players = new ArrayList<>();
+    private List<Player> dealCardsToEachPlayer(int numPlayers, int currentLevel) {
+        List<Player> players = new ArrayList<>();
 
         for (int i = 0; i < numPlayers; i++) {
-            players.add(PlayerCards.create(currentLevel, players));
+            players.add(Player.create(currentLevel, players));
         }
 
         return players;
@@ -71,21 +74,21 @@ public class TheMindGame {
         return currentCard.number() >= lastCard.number();
     }
 
-    private Card popRandomlyOnePlayerCard(List<PlayerCards> players) {
-        List<PlayerCards> playersWithCards = players
+    private Card popRandomlyOnePlayerCard(List<Player> players) {
+        List<Player> playersWithCards = players
                 .stream()
-                .filter(PlayerCards::hasCards)
+                .filter(Player::hasCards)
                 .collect(Collectors.toList());
 
         int randomPos = new Random().nextInt(playersWithCards.size());
-        PlayerCards randomPlayer = playersWithCards.get(randomPos);
+        Player randomPlayer = playersWithCards.get(randomPos);
 
         return randomPlayer.popMinCard();
     }
 
-    private boolean areStillCardsToPlay(List<PlayerCards> players) {
+    private boolean areStillCardsToPlay(List<Player> players) {
         return players
                 .stream()
-                .anyMatch(PlayerCards::hasCards);
+                .anyMatch(Player::hasCards);
     }
 }
