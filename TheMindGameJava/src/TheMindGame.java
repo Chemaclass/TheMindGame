@@ -4,18 +4,15 @@ import java.util.stream.Collectors;
 public class TheMindGame {
 
     public static void main(String[] args) {
-        int numPlayers = 2, numLevelsToWin = 2;
-
-        TheMindGame theMindGame = new TheMindGame();
-        TheMindGameResult result = theMindGame.play(numPlayers, numLevelsToWin);
-
+        int numPlayers = 3, numLevelsToWin = 2;
+        TheMindGameResult result = new TheMindGame().play(numPlayers, numLevelsToWin);
         System.out.println(result);
     }
 
     public TheMindGameResult play(int numPlayers, int numLevelsToWin) {
         int failedGames = 0, currentLevel = 1;
         List<Card> pileOfCards = new ArrayList<>();
-        Map<Integer, List<Card>> result = new HashMap<>();
+        Map<Integer, List<Card>> successfulPiles = new HashMap<>();
 
         while (currentLevel <= numLevelsToWin) {
             int desiredPileOfCardsNumber = numPlayers * currentLevel;
@@ -27,7 +24,7 @@ public class TheMindGame {
                 if (!this.isValidCardInPile(currentCard, pileOfCards)) {
                     failedGames++;
                     currentLevel = 1;
-                    result = new HashMap<>();
+                    successfulPiles = new HashMap<>();
                     System.out.println("Failed game number " + failedGames + ". Trying again... brrr");
                     break;
                 }
@@ -35,14 +32,14 @@ public class TheMindGame {
                 pileOfCards.add(currentCard);
             } while (this.areStillCardsToPlay(players));
 
-            if (desiredPileOfCardsNumber == pileOfCards.size()) {
-                result.put(currentLevel, pileOfCards);
+            if (pileOfCards.size() >= desiredPileOfCardsNumber) {
+                successfulPiles.put(currentLevel, pileOfCards);
                 pileOfCards = new ArrayList<>();
                 currentLevel++;
             }
         }
 
-        return new TheMindGameResult(failedGames, result);
+        return new TheMindGameResult(failedGames, successfulPiles);
     }
 
     private List<PlayerCards> dealCardsToEachPlayer(int numPlayers, int currentLevel) {
@@ -80,6 +77,6 @@ public class TheMindGame {
     private boolean areStillCardsToPlay(List<PlayerCards> players) {
         return players
                 .stream()
-                .anyMatch(c -> c.totalCards() > 0);
+                .anyMatch(PlayerCards::hasCards);
     }
 }
