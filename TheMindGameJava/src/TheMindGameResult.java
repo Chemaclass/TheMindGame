@@ -1,3 +1,5 @@
+import ReadModel.Card;
+
 import java.util.List;
 import java.util.Map;
 
@@ -10,17 +12,8 @@ public class TheMindGameResult {
         this.result = result;
     }
 
-    public int getFailedGames() {
-        return failedGames;
-    }
-
-    public Map<Integer, List<Card>> getResult() {
-        return result;
-    }
-
     @Override
     public String toString() {
-        return "failedGames=" + failedGames +
-                ", " + result;
+        return "failedGames=" + failedGames + ", " + result;
     }
 }

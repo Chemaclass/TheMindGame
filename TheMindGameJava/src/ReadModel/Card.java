@@ -1,4 +1,4 @@
-import java.util.Comparator;
+package ReadModel;
 
 public class Card implements Comparable<Card> {
     private final int number;

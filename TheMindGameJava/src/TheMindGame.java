@@ -1,32 +1,38 @@
+import ReadModel.Card;
+import ReadModel.Player;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class TheMindGame {
+public class TheMindGame implements Runnable {
     public static final int FAILED_GAMES_DEBUG = 2_500_000;
     private final int numPlayers;
     private final int numLevelsToWin;
 
-    private int failedGames = 0;
+    private static int failedGames = 0;
     private int currentLevel = 1;
-
-    public static void main(String[] args) {
-        int numPlayers = 2, numLevelsToWin = 4;
-        TheMindGameResult result = new TheMindGame(numPlayers, numLevelsToWin).play();
-        System.out.println(result);
-    }
+    private static boolean keepRunningThread = true;
 
     public TheMindGame(int numPlayers, int numLevelsToWin) {
         this.numPlayers = numPlayers;
         this.numLevelsToWin = numLevelsToWin;
     }
 
+    @Override
+    public void run() {
+        System.out.println("Inside : " + Thread.currentThread().getName());
+        TheMindGameResult result = play();
+        System.out.println(result);
+    }
+
     public TheMindGameResult play() {
         Map<Integer, List<Card>> successfulPiles = new HashMap<>();
 
-        while (currentLevel <= numLevelsToWin) {
+        while (stillLookingForSolution()) {
             List<Card> pileOfCards = new ArrayList<>();
             int desiredPileOfCardsNumber = numPlayers * currentLevel;
             List<Player> players = dealCardsToEachPlayer(numPlayers, currentLevel);
+
             if (isDebugEnabled()) {
                 System.err.println(players);
             }
@@ -35,7 +41,7 @@ public class TheMindGame {
                 Card currentCard = popRandomlyOnePlayerCard(players);
 
                 if (!isValidCardInPile(currentCard, pileOfCards)) {
-                    failedGames++;
+                    incrementFailedGames();
                     currentLevel = 1;
                     successfulPiles = new HashMap<>();
                     if (isDebugEnabled()) {
@@ -56,7 +62,17 @@ public class TheMindGame {
             currentLevel++;
         }
 
+        keepRunningThread = false;
+
         return new TheMindGameResult(failedGames, successfulPiles);
+    }
+
+    private synchronized void incrementFailedGames() {
+        failedGames++;
+    }
+
+    private boolean stillLookingForSolution() {
+        return currentLevel <= numLevelsToWin && keepRunningThread;
     }
 
     private List<Player> dealCardsToEachPlayer(int numPlayers, int currentLevel) {

@@ -1,3 +1,5 @@
+package ReadModel;
+
 import java.util.*;
 
 public class Player {
@@ -38,14 +40,6 @@ public class Player {
 
     public Card popMinCard() {
         return this.cards.pop();
-//        Card minCard = this.cards
-//                .stream()
-//                .min(Comparator.comparing(Card::number))
-//                .get();
-//
-//        this.cards.remove(minCard);
-//
-//        return minCard;
     }
 
     public int totalCards() {
