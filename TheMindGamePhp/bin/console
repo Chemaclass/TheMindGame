@@ -8,6 +8,6 @@ use App\TheMindGame;
 require dirname(__DIR__) . '/vendor/autoload.php';
 
 $theMindGame = new TheMindGame();
-$result = $theMindGame->play($numPlayers = 3, $numLevelsToWin = 2);
+$result = $theMindGame->play($numPlayers = 3, $numLevelsToWin = 3);
 
 dd($result);
