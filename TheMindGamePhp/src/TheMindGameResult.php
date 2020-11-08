@@ -14,7 +14,7 @@ final class TheMindGameResult
         return new self($failedGames, $result);
     }
 
-    public static function empty(): self
+    public static function createEmpty(): self
     {
         return new self(0, []);
     }

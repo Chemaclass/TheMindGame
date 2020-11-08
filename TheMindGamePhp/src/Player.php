@@ -4,27 +4,31 @@ declare(strict_types=1);
 
 namespace App;
 
-final class PlayerCards
+final class Player
 {
     private const MIN_VALUE = 1;
-    private const MAX_VALUE = 150;
+    private const MAX_VALUE = 100;
 
     /**
      * @var Card[]
      */
     private array $cards;
 
-    public static function create(int $currentLevel, PlayerCards...$existingPlayerCards): self
+    /**
+     * A player consist of a list of (already-sorted) cards
+     */
+    public static function create(int $currentLevel, Player...$existingPlayers): self
     {
         $cards = [];
+
         $allNumbers = array_map(
             static fn(Card $c): int => $c->number(),
             array_merge(...array_map(
-                static fn(PlayerCards $pc): array => $pc->cards,
-                $existingPlayerCards
+                static fn(Player $pc): array => $pc->cards,
+                $existingPlayers
             ))
         );
-//dump($allNumbers);
+
         for ($i = 0; $i < $currentLevel; $i++) {
             do {
                 $cardNumber = random_int(self::MIN_VALUE, self::MAX_VALUE);
@@ -34,7 +38,8 @@ final class PlayerCards
             $cards[] = new Card($cardNumber);
         }
 
-//        dd($allNumbers);
+        usort($cards, static fn(Card $c1, Card $c2) => $c2->number() <=> $c1->number());
+
         return new self($cards);
     }
 
@@ -45,14 +50,7 @@ final class PlayerCards
 
     public function popMinCard(): Card
     {
-        $minCard = min(array_map(
-            static fn(Card $c): int => $c->number(),
-            $this->cards
-        ));
-
-        $this->cards = array_diff($this->cards, [new Card($minCard)]);
-
-        return new Card($minCard);
+        return array_pop($this->cards);
     }
 
     public function totalCards(): int
