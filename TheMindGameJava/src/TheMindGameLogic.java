@@ -32,10 +32,6 @@ public class TheMindGameLogic {
             int desiredPileOfCardsNumber = numPlayers * currentLevel;
             List<Player> players = dealCardsToEachPlayer(numPlayers, currentLevel);
 
-            if (isDebugEnabled()) {
-                System.err.println(players);
-            }
-
             do {
                 Card currentCard = popRandomlyOnePlayerCard(players);
 
@@ -43,9 +39,7 @@ public class TheMindGameLogic {
                     incrementFailedGames();
                     currentLevel = 1;
                     successfulPiles = new HashMap<>();
-                    if (isDebugEnabled()) {
-                        System.out.println("Failed game number " + failedGames + ". Trying again... brrr");
-                    }
+                    displayDebugInfo(currentCard, pileOfCards);
                     break;
                 }
 
@@ -66,6 +60,17 @@ public class TheMindGameLogic {
         }
 
         return new TheMindGameLogicResult(failedGames, successfulPiles);
+    }
+
+    private void displayDebugInfo(Card currentCard, List<Card> pileOfCards) {
+        if (isDebugEnabled()) {
+            System.out.printf(
+                    "Failed game Nr %d. Trying again... brrr (current:%d, last:%d)\n",
+                    failedGames,
+                    currentCard.number(),
+                    lastPileCard(pileOfCards).number()
+            );
+        }
     }
 
     private synchronized void incrementFailedGames() {
@@ -96,9 +101,11 @@ public class TheMindGameLogic {
             return true;
         }
 
-        Card lastCard = pileOfCards.get(pileOfCards.size() - 1);
+        return currentCard.number() >= lastPileCard(pileOfCards).number();
+    }
 
-        return currentCard.number() >= lastCard.number();
+    private Card lastPileCard(List<Card> pileOfCards) {
+        return pileOfCards.get(pileOfCards.size() - 1);
     }
 
     private Card popRandomlyOnePlayerCard(List<Player> players) {
