@@ -1,103 +1,23 @@
-import java.util.*;
-import java.util.stream.Collectors;
 
-public class TheMindGame {
-    public static final int FAILED_GAMES_DEBUG = 2_500_000;
+public class TheMindGame implements Runnable {
     private final int numPlayers;
     private final int numLevelsToWin;
-
-    private int failedGames = 0;
-    private int currentLevel = 1;
-
-    public static void main(String[] args) {
-        int numPlayers = 2, numLevelsToWin = 4;
-        TheMindGameResult result = new TheMindGame(numPlayers, numLevelsToWin).play();
-        System.out.println(result);
-    }
 
     public TheMindGame(int numPlayers, int numLevelsToWin) {
         this.numPlayers = numPlayers;
         this.numLevelsToWin = numLevelsToWin;
     }
 
-    public TheMindGameResult play() {
-        Map<Integer, List<Card>> successfulPiles = new HashMap<>();
+    @Override
+    public void run() {
+        System.out.println("Inside : " + Thread.currentThread().getName());
 
-        while (currentLevel <= numLevelsToWin) {
-            List<Card> pileOfCards = new ArrayList<>();
-            int desiredPileOfCardsNumber = numPlayers * currentLevel;
-            List<Player> players = dealCardsToEachPlayer(numPlayers, currentLevel);
-            if (isDebugEnabled()) {
-                System.err.println(players);
-            }
+        TheMindGameLogic logic = new TheMindGameLogic(numPlayers, numLevelsToWin);
+        TheMindGameLogicResult result = logic.play();
+        TheMindGameLogic.stopRunningThreads();
 
-            do {
-                Card currentCard = popRandomlyOnePlayerCard(players);
-
-                if (!isValidCardInPile(currentCard, pileOfCards)) {
-                    failedGames++;
-                    currentLevel = 1;
-                    successfulPiles = new HashMap<>();
-                    if (isDebugEnabled()) {
-                        System.out.println("Failed game number " + failedGames + ". Trying again... brrr");
-                    }
-                    break;
-                }
-
-                pileOfCards.add(currentCard);
-            } while (areStillCardsToPlay(players));
-
-            // Don't level-up if the pile miss cards
-            if (pileOfCards.size() < desiredPileOfCardsNumber) {
-                continue;
-            }
-
-            successfulPiles.put(currentLevel, pileOfCards);
-            currentLevel++;
+        if (!result.isEmpty()) {
+            System.out.println(result);
         }
-
-        return new TheMindGameResult(failedGames, successfulPiles);
-    }
-
-    private List<Player> dealCardsToEachPlayer(int numPlayers, int currentLevel) {
-        List<Player> players = new ArrayList<>();
-
-        for (int i = 0; i < numPlayers; i++) {
-            players.add(Player.create(currentLevel, players));
-        }
-
-        return players;
-    }
-
-    private boolean isDebugEnabled() {
-        return failedGames % FAILED_GAMES_DEBUG == 0;
-    }
-
-    private boolean isValidCardInPile(Card currentCard, List<Card> pileOfCards) {
-        if (pileOfCards.isEmpty()) {
-            return true;
-        }
-
-        Card lastCard = pileOfCards.get(pileOfCards.size() - 1);
-
-        return currentCard.number() >= lastCard.number();
-    }
-
-    private Card popRandomlyOnePlayerCard(List<Player> players) {
-        List<Player> playersWithCards = players
-                .stream()
-                .filter(Player::hasCards)
-                .collect(Collectors.toList());
-
-        int randomPos = new Random().nextInt(playersWithCards.size());
-        Player randomPlayer = playersWithCards.get(randomPos);
-
-        return randomPlayer.popMinCard();
-    }
-
-    private boolean areStillCardsToPlay(List<Player> players) {
-        return players
-                .stream()
-                .anyMatch(Player::hasCards);
     }
 }
