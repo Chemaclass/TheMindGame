@@ -30,7 +30,7 @@ public class TheMindGameLogic {
         while (stillLookingForSolution()) {
             List<Card> pileOfCards = new ArrayList<>();
             int desiredPileOfCardsNumber = numPlayers * currentLevel;
-            List<Player> players = dealCardsToEachPlayer(numPlayers, currentLevel);
+            List<Player> players = dealCardsToEachPlayer();
 
             do {
                 Card currentCard = popRandomlyOnePlayerCard(players);
@@ -78,11 +78,11 @@ public class TheMindGameLogic {
     }
 
     private boolean stillLookingForSolution() {
-        return currentLevel <= numLevelsToWin
-                && keepRunningThread;
+        return keepRunningThread
+                && currentLevel <= numLevelsToWin;
     }
 
-    private List<Player> dealCardsToEachPlayer(int numPlayers, int currentLevel) {
+    private List<Player> dealCardsToEachPlayer() {
         List<Player> players = new ArrayList<>();
 
         for (int i = 0; i < numPlayers; i++) {
@@ -109,11 +109,7 @@ public class TheMindGameLogic {
     }
 
     private Card popRandomlyOnePlayerCard(List<Player> players) {
-        List<Player> playersWithCards = players
-                .stream()
-                .filter(Player::hasCards)
-                .collect(Collectors.toList());
-
+        List<Player> playersWithCards = playersWithCards(players);
         int randomPos = new Random().nextInt(playersWithCards.size());
         Player randomPlayer = playersWithCards.get(randomPos);
 
@@ -121,8 +117,13 @@ public class TheMindGameLogic {
     }
 
     private boolean areStillCardsToPlay(List<Player> players) {
+        return !playersWithCards(players).isEmpty();
+    }
+
+    private List<Player> playersWithCards(List<Player> players) {
         return players
                 .stream()
-                .anyMatch(Player::hasCards);
+                .filter(Player::hasCards)
+                .collect(Collectors.toList());
     }
 }
